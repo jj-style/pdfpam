@@ -1,4 +1,6 @@
-import subprocess, shlex, sys
+import subprocess
+import shlex
+import sys
 from tempfile import NamedTemporaryFile as NTF
 from pathlib import Path
 
