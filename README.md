@@ -3,6 +3,7 @@ CLI utility for picking and choosing pages from certain PDF files and combining 
 
 ## Requirements
 - `pdftk`
+- [click](https://github.com/pallets/click/)
 
 ## Usage
 `python3 main.py config.txt /path/to/dir/of/pdfs output.pdf`
