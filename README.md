@@ -24,5 +24,5 @@ and combine them all into one file.
 
 
 # Roadmap
-- [] Create python package on pypi
-- [] Create a proper CLI with more config options like different glob options for files in the directory, specifying multiple directories
+- [ ] Create python package on pypi
+- [ ] Create a proper CLI with more config options like different glob options for files in the directory, specifying multiple directories
