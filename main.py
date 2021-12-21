@@ -3,6 +3,12 @@ import shlex
 import sys
 from tempfile import NamedTemporaryFile as NTF
 from pathlib import Path
+import click
+
+
+def abort(message: str, code: int = 1):
+    print(message, file=sys.stderr)
+    exit(code)
 
 
 def get_file_range_dispatch(files, directory):
@@ -26,41 +32,39 @@ def get_file_range_dispatch(files, directory):
     return frd
 
 
-def main():
-    args = sys.argv[1:]
-    if len(args) < 3:
-        print("usage: pdfpam input directory output", file=sys.stderr)
-        exit(1)
-    file, dirr, output = args[0], args[1], args[2]
-
+@click.command()
+@click.argument("config", type=click.Path(exists=True))
+@click.argument(
+    "directory",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, readable=True),
+)
+@click.argument("output", type=click.Path(exists=False))
+def main(config: Path, directory, output):
+    """Pick n' Mix to select and combine pages from multiple PDFs into one"""
     try:
-        frd = get_file_range_dispatch(file, dirr)
+        frd = get_file_range_dispatch(config, directory)
     except Exception as e:
-        print(e, file=sys.stderr)
-        exit(1)
+        abort(e)
 
     out = Path(output)
     if out.exists():
-        print(
-            f"warning: {out} already exists. Aborting to prevent overwriting data",
-            file=sys.stderr,
-        )
-        exit(1)
+        abort(f"warning: {out} already exists. Aborting to prevent overwriting data")
 
     tmp1 = NTF(suffix=".pdf")
     tmp2 = NTF(suffix=".pdf")
 
     for file, page_range in frd.items():
-        if not out.exists():  # first run
-            subprocess.run(shlex.split(f"pdftk {file} cat {page_range} output {out}"))
-        else:
-            subprocess.run(
-                shlex.split(f"pdftk {file} cat {page_range} output {tmp1.name}")
+        # extract the requested pages from the pdf and store either in
+        # tmp file or output depending if first run
+        subprocess.run(
+            shlex.split(
+                f"pdftk {file} cat {page_range} output {tmp1.name if not out.exists() else out}"  # noqa
             )
-            subprocess.run(shlex.split(f"cp {out} {tmp2.name}"))
-            subprocess.run(
-                shlex.split(f"pdftk {tmp2.name} {tmp1.name} cat output {out}")
-            )
+        )
+        # combine previous extracted and new into one
+        subprocess.run(shlex.split(f"cp {out} {tmp2.name}"))
+        subprocess.run(shlex.split(f"pdftk {tmp2.name} {tmp1.name} cat output {out}"))
+
     tmp1.close()
     tmp2.close()
 
