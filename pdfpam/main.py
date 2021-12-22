@@ -12,7 +12,7 @@ def abort(message: str, code: int = 1):
     exit(code)
 
 
-def get_file_range_map(files: str, directory: str) -> Dict[str][str]:
+def get_file_range_map(files: str, directory: str) -> Dict[str, str]:
     dir_p = Path(directory)
     if not dir_p.exists():
         raise Exception(f"directory: {directory} does not exist")
