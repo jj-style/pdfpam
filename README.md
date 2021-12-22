@@ -5,8 +5,16 @@ CLI utility for picking and choosing pages from certain PDF files and combining 
 - `pdftk`
 - [click](https://github.com/pallets/click/)
 
+## Installation
+You can install from source like so:
+```
+git clone github.com/jj-style/pdfpam
+cd pdfpam
+pip install -e .
+```
+
 ## Usage
-`python3 main.py config.txt /path/to/dir/of/pdfs output.pdf`
+`pdfpam config.txt /path/to/dir/of/pdfs output.pdf`
 
 ## Configuration
 The input file must have the following format:  
@@ -22,8 +30,3 @@ This would extract pages:
 and combine them all into one file.
 
 **Note the files must all be in the same directory and be identifiable by something followed by a hyphen, e.g. `[1,2,3]-file.pdf`, `[a,b,c]-file.pdf`.**
-
-
-# Roadmap
-- [ ] Create python package on pypi
-- [ ] Create a proper CLI with more config options like different glob options for files in the directory, specifying multiple directories
