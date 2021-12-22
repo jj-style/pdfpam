@@ -53,14 +53,16 @@ def main(config: Path, directory, output):
     tmp1 = NTF(suffix=".pdf")
     tmp2 = NTF(suffix=".pdf")
 
-    for file, page_range in frd.items():
+    for idx, (file, page_range) in enumerate(frd.items()):
         # extract the requested pages from the pdf and store either in
         # tmp file or output depending if first run
         subprocess.run(
             shlex.split(
-                f"pdftk {file} cat {page_range} output {tmp1.name if not out.exists() else out}"  # noqa
+                f"pdftk {file} cat {page_range} output {tmp1.name if out.exists() else out}"  # noqa
             )
         )
+        if idx == 0:
+            continue
         # combine previous extracted and new into one
         subprocess.run(shlex.split(f"cp {out} {tmp2.name}"))
         subprocess.run(shlex.split(f"pdftk {tmp2.name} {tmp1.name} cat output {out}"))
