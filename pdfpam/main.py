@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile as NTF
 from pathlib import Path
 from typing import Dict
 import click
+from tqdm import tqdm
 
 
 def abort(message: str, code: int = 1):
@@ -34,13 +35,29 @@ def get_file_range_map(files: str, directory: str) -> Dict[str, str]:
 
 
 @click.command()
+@click.option(
+    "-f",
+    "--force",
+    "force",
+    default=False,
+    help="force overwrite of output file if it already exists",
+    is_flag=True,
+)
+@click.option(
+    "-s",
+    "--silent",
+    "silent",
+    default=False,
+    help="suppress informational output",
+    is_flag=True,
+)
 @click.argument("config", type=click.Path(exists=True))
 @click.argument(
     "directory",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, readable=True),
 )
 @click.argument("output", type=click.Path(exists=False))
-def main(config, directory, output):
+def main(force, silent, config, directory, output):
     """Pick n' Mix to select and combine pages from multiple PDFs into one"""
     try:
         fr = get_file_range_map(config, directory)
@@ -49,12 +66,19 @@ def main(config, directory, output):
 
     out = Path(output)
     if out.exists():
-        abort(f"warning: {out} already exists. Aborting to prevent overwriting data")
+        if force:
+            out.unlink()
+        else:
+            abort(
+                f"warning: {out} already exists. Aborting to prevent overwriting data"
+            )
 
     tmp1 = NTF(suffix=".pdf")
     tmp2 = NTF(suffix=".pdf")
 
-    for idx, (file, page_range) in enumerate(fr.items()):
+    for idx, (file, page_range) in enumerate(
+        tqdm(fr.items(), ascii=True, unit="files", disable=silent)
+    ):
         # extract the requested pages from the pdf and store either in
         # tmp file or output depending if first run
         subprocess.run(
