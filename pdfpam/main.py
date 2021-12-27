@@ -67,7 +67,7 @@ def get_file_range_map(files: str, directory: str) -> Dict[str, str]:
     type=click.Path(exists=True, file_okay=False, dir_okay=True, readable=True),
 )
 @click.argument("output", type=click.Path(exists=False))
-def main(force, silent, config, directory, output):
+def main(force, silent, version, config, directory, output):
     """Pick n' Mix to select and combine pages from multiple PDFs into one"""
     try:
         fr = get_file_range_map(config, directory)
