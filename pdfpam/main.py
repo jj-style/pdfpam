@@ -7,10 +7,19 @@ from typing import Dict
 import click
 from tqdm import tqdm
 
+from pdfpam import __version__
+
 
 def abort(message: str, code: int = 1):
     print(message, file=sys.stderr)
     exit(code)
+
+
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    click.echo(f"pdfpam v{__version__}")
+    ctx.exit()
 
 
 def get_file_range_map(files: str, directory: str) -> Dict[str, str]:
@@ -51,6 +60,7 @@ def get_file_range_map(files: str, directory: str) -> Dict[str, str]:
     help="suppress informational output",
     is_flag=True,
 )
+@click.option("-v", "--version", is_flag=True, is_eager=True, callback=print_version)
 @click.argument("config", type=click.Path(exists=True))
 @click.argument(
     "directory",
