@@ -4,6 +4,7 @@ CLI utility for picking and choosing pages from certain PDF files and combining 
 ## Requirements
 - `pdftk`
 - [click](https://github.com/pallets/click/)
+- [tqdm](https://github.com/tqdm/tqdm)
 
 ## Installation
 You can install from source like so:
